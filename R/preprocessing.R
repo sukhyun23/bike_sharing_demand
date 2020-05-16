@@ -28,6 +28,9 @@ qqnorm(data_pre$count)
 qqline(data_pre$count)
 hist(data_pre$count)
 
+# challenge
+# modeling separately by weekend
+
 
 qqnorm(data_pre$registered)
 qqline(data_pre$registered)
@@ -61,22 +64,39 @@ ggplot(data_pre, aes(x=temp, y=count)) +
 
 data_tr
 m1 <- lm(
-  count ~ season * weather + atemp + humidity + windspeed, 
+  count ~ season + weather + atemp + humidity + windspeed + poly(hour, 2), 
   data_tr[weather != 'worst', ]
 )
 par(mfrow = c(2,2))
 plot(m1)
 m1 %>% summary()
-m1$residuals %>% hist()
-data_tr$count %>% hist()
+plot(data_tr$hour, data_tr$count)
 
 m2 <- lm(
-  count ~ season + weather + atemp * humidity * windspeed,
+  count ~ season + weather + atemp * humidity * windspeed + poly(hour, 3),
   data_pre[weather != 'worst', ]
 )
+plot(data_pre$hour, data_pre$count)
+
 par(mfrow = c(2,2))
 plot(m2)
 m2 %>% summary()
+
+
+install.packages(c('rmarkdown', "rsconnect"))
+
+
+data_pre[weekend == 'yes', ]$casual %>% hist()
+data_pre[weekend == 'no', ]$casual %>% hist()
+
+data_pre[weekend == 'yes', ]$registered %>% hist()
+data_pre[weekend == 'no', ]$registered %>% hist()
+
+data_pre[weekend == 'yes', ]$count %>% hist()
+data_pre[weekend == 'no', ]$count %>% hist()
+
+data_pre
+
 
 d <- data_pre[weather != 'worst', .(season, weather, atemp, humidity, windspeed)]
 d$resid <- m2$residuals

@@ -8,13 +8,14 @@ sum((data_tr$casual + data_tr$registered) == data_tr$count)
 
 par(mfrow = c(1,3))
 for (i in c('casual', 'registered', 'count')) {
-  hist(data_tr[[i]], ylim = c(0,6000), xlim = c(0, 1000), main = i)
+  m <- round(mean(data_tr[[i]]))
+  v <- round(var(data_tr[[i]]))
+  m <- paste('mean :', m)
+  v <- paste('var :', v)
+  hist(
+    data_tr[[i]], ylim = c(0,6000), xlim = c(0, 1000), main = title(c(i,m,v))
+  )
 }
-
-c(mean(data_tr$casual), var(data_tr$casual))
-c(mean(data_tr$registered), var(data_tr$registered))
-c(mean(data_tr$count), var(data_tr$count))
-
 
 
 # date of train, test -----------------------------------------------------
@@ -77,14 +78,16 @@ ggplot(data_tr) +
 
 # time series -------------------------------------------------------------
 par(mfrow = c(1,3))
-plot(data_tr$datetime, data_tr$casual)
-plot(data_tr$datetime, data_tr$registered)
-plot(data_tr$datetime, data_tr$count)
+for (i in c('casual', 'registered', 'count')) {
+  plot(
+    data_tr$datetime, data_tr[[i]], xlab = 'datetime', ylab = '', main = i
+  )
+}
 
 # profile by day
 par(mfrow = c(1,1))
-plot(data_tr$hour, data_tr$count, 'n')
-by(data_tr, data_tr$date, function(d) lines(d$hour, d$count))
+plot(data_tr$hour, data_tr$count, 'n', xlab = 'hour', ylab = 'count')
+by(data_tr, data_tr$date, function(d) lines(d$hour, d$count, col=alpha(1, 0.3)))
 
 # data <- data_tr
 profile_hour <- function(data, figsize = c(1,2), group, y) {
@@ -98,7 +101,7 @@ profile_hour <- function(data, figsize = c(1,2), group, y) {
     by(
       data[data[[group]] == i],
       data[data[[group]] == i]$date,
-      function(d) lines(d$hour, d[[y]])
+      function(d) lines(d$hour, d[[y]], col=alpha(1, 0.3))
     )    
   }
   invisible(NULL)
@@ -128,6 +131,11 @@ dev.off()
 profile_hour(data_tr, c(1,2), 'weekend', 'casual')
 profile_hour(data_tr, c(1,2), 'weekend', 'registered')
 profile_hour(data_tr, c(1,2), 'weekend', 'count')
+
+
+profile_hour(data_pre, c(1,2), 'weekend', 'casual')
+profile_hour(data_pre, c(1,2), 'weekend', 'registered')
+profile_hour(data_pre, c(1,2), 'weekend', 'count')
 
 
 
