@@ -1,0 +1,327 @@
+---
+title: "report"
+author: "sukhyun kwon"
+date: '2020 6 28'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+library(mgcv); library(reshape2); library(plotly)
+source('./R/data_cleansing.R')
+```
+본 문서는 개인의 학습 목적으로 작성 되었기 때문에 틀린것이 있을 수 있습니다.
+<br>  
+
+# 포아송 분포
+포아송 분포는 확률론에서 단위 시간안에 어떤 사건이 몇 번 발생할 것인지를 표현하는 이산 확률 분포이다.
+정해진 시간 안에 어떤 사건이 일어날 횟수에 대한 기대값을 $\lambda$라 했을 때, 그 사건이 $n$회 일어날 확률은 다음과 같다.
+<br>  
+$f(n;\lambda) = \frac {\lambda^ne^{-\lambda}} {n!}$ $,  \lambda > 0$
+<br>  
+또한 기댓값과 분산이 $\lambda$로 동일하다는 특징이 있다.
+<br>  
+$y$로 사용될 자전거 대여 횟수는 포아송 분포라고 할 수 있을까? 대여 횟수와 같은 변수는 확률적으로 값이 결정되는 확률 변수라고 봐야 할 것이다. 본 데이터는 1시간 단위의 구간내에서 사건이 발생할 건수를 집계한 데이터이다. 포아송 분포의 특성을 일부 만족 한다. 그러나 본 데이터의 평균과 분산은 다르다. 그리고 각 단위 시간이 독립임을 확신할 수 없다. 즉, $y_i, y_j, i \neq j$가 독립이 아니다.
+<br>  
+포아송 가정을 만족하지 않는 부분 때문에 포아송을 가정하고 모델링하면 아마 문제가 생길것이다. 이를 인지하고 문제점에 대한 해결책을 찾으면서 시도해볼 것이다.
+<br>  
+<br>  
+
+# 데이터 탐색
+모델링 하기에 앞서서 데이터에 대한 이해가 필요하기 때문에 다양한 그림과 기초 통계 수치를 살펴볼 필요가 있다.
+<br>  
+```{r, echo=FALSE, fig.width=12, fig.height=4}
+par(mfrow = c(1,3))
+for (i in c('casual', 'registered', 'count')) {
+  m <- round(mean(dat_tr[[i]]))
+  v <- round(var(dat_tr[[i]]))
+  m <- paste('mean :', m)
+  v <- paste('var :', v)
+  hist(
+    dat_tr[[i]], ylim = c(0,6000), xlim = c(0, 1000), main = title(c(i,m,v)),
+    xlab = ''
+  )
+}
+```
+평균과 분산은 큰 차이가 있고 분포가 매우 비대칭적임을 볼 수 있다.
+<br>  
+<br>  
+
+```{r, echo=FALSE, fig.width=12, fig.height=4}
+par(mfrow = c(1,3))
+for (i in c('casual', 'registered', 'count')) {
+  plot(
+    dat_tr$datetime, dat_tr[[i]], xlab = 'datetime', ylab = '', main = i
+  )
+}
+```
+시간의 흐름에 따라 어떤 패턴이 있어 보이지만 비교적 분명하지는 않아 보인다.
+자전거 대여점의 특성상 매일 정해진 영업 시간에만 운영 되기 때문에 하루 단위로 보는것이 더 적절할 것이라 판단된다.
+<br>  
+<br>  
+
+```{r, echo=FALSE, fig.width=4.5, fig.height=3.5, message=FALSE, warning=FALSE}
+par(mfrow = c(1,1), mar = c(4,4,1.5,1))
+plot(dat_tr$hour, dat_tr$count, 'n', xlab = 'hour', ylab = 'count')
+f <- function(d) {
+  lines(d$hour, d$count, col=alpha(1, 0.3))
+  invisible(NULL)
+}
+dat_sub <- dat_tr[, c('hour', 'count', 'date')]
+dat_list <- split(dat_sub, dat_sub$date)
+a <- lapply(dat_list, f); rm(a)
+```
+<br>  
+위 그림의 개별 선은 1일이고 시간의 흐름에 따른 대여 횟수의 변화를 나타낸다. 하루 단위로 대여 횟수의 변화가 어느정도 눈에 보인다.
+
+<br>  
+```{r, echo=FALSE, fig.width=7, fig.height=3.5, message=FALSE, warning=FALSE}
+  par(mfrow = c(1,2))
+    for (i in unique(dat_tr$weekend)) {
+    plot(
+      dat_tr$hour, dat_tr$count, 'n',
+      main = paste('weekend', i, sep = ' : '),
+      xlab = 'hour', ylab = 'count', xaxt='n'
+    )
+    axis(1, 0:23)
+    
+    f <- function(d) {
+      lines(d$hour, d$count, col=alpha(1, 0.3))
+    }
+    dat_sub <- dat_tr[weekend == i, c('hour', 'count', 'date')]
+    d_list <- split(dat_sub, dat_sub$date)
+    lapply(d_list, f)
+
+    means <- tapply(dat_sub$count, dat_sub$hour, mean)
+    lines(0:23, means, lwd=5, col='dodgerblue1')
+  }
+```
+<br>  
+다양한 범주형 변수로 구분해서 그려본 결과 이용자 방문 패턴은 주중/주말에 가장 뚜렷하게 차이가 났다.
+주중에 6~9, 17~18시 부근에 이용자가 급격히 증가하는 것은 아마도 출퇴근하는 사람으로 추측할 수 있다.
+
+<br>  
+<br>  
+
+# 포아송 모형
+포아송 모형을 간단하게 적합시켜 보았다.
+```{r, fig.width=5, fig.height=5}
+model <- count ~ workingday + weather + temp + humidity + windspeed
+poi_fit <- glm(formula = model, data = dat_tr, family = poisson)
+summary(poi_fit)
+```
+
+계수의 유의성은 있지만 시간의 흐름에 따른 영향을 배제하거나 포함하지 않았기 때문에 이 결과를 신뢰하기 어렵다.
+<br>  
+```{r, fig.width=5, fig.height=5, echo=FALSE}
+# observed vs expected
+obs_counts <- table(dat_tr$count)[1:100]
+exp_probs <- sapply(1:100, function(x) dpois(x, poi_fit$fitted.values))
+exp_counts <- round(apply(exp_probs, 2, sum))
+
+plot(1:100, obs_counts, pch = 19, col = 'red', xlab = 'count', ylim=c(0, max(obs_counts)))
+lines(1:100, obs_counts, col = 'red')
+points(1:100, exp_counts, pch = 19, col = 'blue')
+lines(1:100, exp_counts, col = 'blue')
+legend('topright', c('obs', 'exp'), pch=19, col=c('red', 'blue'))
+```
+
+모형의 가정과 실제값이 큰 차이가 있음을 확인할 수 있다.
+<br>  
+<br>  
+```{r}
+# dispersion statistic
+pchi2 <- sum(residuals(poi_fit, type = 'pearson')^2)
+disp <- pchi2/poi_fit$df.residual
+disp
+```
+dispersion statistic은 포아송 모형에서 overdispersion을 판단하는 척도로 보통 1을 넘으면 overdispersion이 있다고 본다. 
+(modeling count data 참조, hilbe)
+<br>  
+<br>  
+
+# 모형의 문제점
+### 1) overdispersion
+overdispersion은 통계 모형에서 기대되는 변동보다 실제 관찰값의 변동이 훨씬 큰 것을 의미한다. 
+이 경우 표준오차가 불편성(unbiasedness)을 만족하지 못하게 되고 과소추정 하게 되어 계수 검정을 신뢰할 수 없게 된다. 따라서 유의하게 보일 수 있지만 실제로는 그렇지 않을 수 있다.
+
+Overdispersion이 발생하는 이유는 다양한데 다음은 Hilbe의 Modeling Count Data에서 발췌 하였다.
+1. 중요한 설명변수가 생략된 경우
+2. 데이터에 이상치가 있는 경우
+3. 충분한 수의 상호작용항을 포함하는데 실패한 경우
+4. 설명변수에 대한 적절한 변환이 필요한 경우
+5. 데이터가 너무 sparse한 경우
+6. 데이터에 결측치가 존재할때 이것이 랜덤이 아닌 경우(MAR)
+
+Overdispersion을 다루는 방법
+quasi likelihood method
+exponential family는 다음과 같은 형태로 쓸 수 있다.
+ $f_Y(y;\theta,\phi)=exp\{ \frac {y\theta-B(\theta)} {\phi} + C(y,\phi) \}$, 
+$B(.), C(.)$은 알려진 함수이다. $\theta$는 canonical parameter, $\phi$는 dispersion parameter라 불린다.
+위와 같은 형식의 분포를 가지는 확률 변수 $Y$의 기대값과 분산은 다음과 같다.
+$\mu=E[Y]=B'(\theta)$, $Var[Y]=B''(\theta)\phi=V(\mu)\phi$
+여기서 $V$는 분산 함수이며 exponential family에 대한 분산함수는 $B''(\theta)$이다.
+dispersion parameter와 분산 함수는 어떤 상수에 대해서만 유일하다.
+
+$Poisson(\lambda)$를 따르는 확률 변수 $Y$는 다음과 같이 쓸 수 있다.
+$f_Y(y) = \frac {\lambda^ye^{-\lambda}} {y!}$
+$=exp\{ylog\lambda-\lambda-logy!\}$
+$=exp\{\frac {ylog\lambda-\lambda} {1} -logy!\}$
+
+이 경우 dispersion parameter는 1이다.
+
+만약 dispersion parameter $\phi > 1$ 이면, 조건부 분산이 평균보다 빠르게 증가할 것이다. 
+
+quasi poisson은 $\phi$를 1이상의 어떤 값으로 추정한다.
+
+$\phi^{\verb!^!} = \frac {1} {n-k} \Sigma \frac {(Y_i-\mu_i^{\verb!^!})^{2}} {\mu_i^{\verb!^!}}$
+
+여기서 $n$은 표본 크기, $k$는 절편 포함 모형에 포함될 변수의 수, ${\mu_i^{\verb!^!}}=g^{-1}(\eta_i^{\verb!^!})$은 fitted 기대값이다.
+위 식은 간단하게 $Pearson\ \chi^{2}$을 잔차 자유도로 나눠준 것이다.
+
+overdispersion을 다룰 또 한가지 방법으로는 음이항 모형이 있다.
+음이항 모형에서 조건부 분산과 평균은 다음과 같은 관계를 가진다.
+$V(Y_i|\eta_i) = \mu_i + \mu_i^{2}/\phi = \mu_i(1+\mu_i/\phi)$
+$\eta_i$는 linear predictor이다.
+여기서 두 번째 항의 작은 $\phi$가 더 큰 분산을 허용하게 된다.
+$\phi \rightarrow \infty$이면 분산은 평균에 근접하게 되고 포아송 분포에 가까워지게 된다.
+quasi poisson과는 대조적으로 조건부 분산이 평균의 2차 함수가 된다.
+
+
+If the observed variance of the response is greater than the expected variance, the data are overdispersed. A model that fails to properly adjust for overdispersed data is called an overdispersed model. As such, its standard errors are biased and cannot be trusted. The standard errors associated with model predictors may appear from the model to significantly contribute to the understanding of the response, but in fact they may not. Many analysts have been deceived into thinking that they have developed a well-fitted model. (modeling count data, hilbe)
+
+Criteria for Apparent Poisson Overdispersion
+1. The model omits important explantory predictors.
+2. The data include outliers.
+3. The model fails to include a sufficient number of interaction terms.
+4. A predictor needs to be transformed to another scale.
+5. There are situations where the data are too sparse and more data need to be collected and included in the model.
+6. Missing values exist in the data but are not randomly distributed in the data; i.e, the are not missing at random (MAR).
+
+이 데이터의 경우 $y_i$들의 독립성이 위배되는것을 확인할 수 있고, 이는 포아송 기본 가정에 위반이다. 따라서 시간의 흐름에 따른 변화가 모형에 고려되어야 한다.
+
+위의 그림에서 확인할 수 있듯 매일 반복되는 특정 사이클이 존재한다. 그리고 그 사이클은 주중/주말에 눈에 띄게 다르다. 이것을 모형에 포함시킬 것이고, 이 사이클의 패턴은 그림과 같은 패턴이라 가정하고 포함시킬 것이다. 그러러면 모형에 비선형성을 도입해야하는데 제곱, 세제곱항으 추가하기 보다는 spline으로 원하는 모양의 곡선을 추가하는것이 좋다고 판단했다.
+
+GLM보다 더 유연하게 비선형성을 포함할 수 있는 대안은 여러가지가 있지만 GAM으로 정했다.
+설명변수들과의 관계가 아주 복잔한 비선형 패턴은 아닐것이고 어느정도 해석성을 유지했으면 좋겠다는 생각이었기 때문이다. 
+GAM은 (GAM과 GLM의 통계적 유사성? 관계?)
+(GᅠAM에 대한 간단한 수식과 알고리즘)
+$E(Y|X_1,X_2,...,X_p)=\alpha + f_1(X_1) + f_2(X_2) + ... + f_p(X_p)$
+<br>  
+<br>  
+
+# GAM 모형
+```{r, fig.height=3.5, fig.width=7}
+hour_fit_wend <- gam(
+  formula = count ~ s(hour, bs = 'cr', k=6),
+  family = poisson(),
+  data = dat_weekend
+)
+hour_fit_wday <- gam(
+  formula = count ~ s(hour, bs = 'cr', k=10),
+  family = poisson(),
+  data = dat_weekday
+)
+par(mfrow=c(1,2))
+plot(hour_fit_wend, all.terms = T)
+plot(hour_fit_wday, all.terms = T)
+```
+
+맨먼저 모형에 시간을 포함하였다.
+
+$y_{weekend} = f_{weekend}(hour)+\epsilon$
+
+$y_{weekday} = f_{weekday}(hour)+\epsilon$
+
+시간의 효과를 배제한 count 변수와 다른 설명변수들을 비교해보면서 모형에 포함될 항을 결정했다.
+<br>  
+<br>  
+
+```{r}
+# 1. model
+dat_weekend$count_dh <- dat_weekend$count - hour_fit_wend$fitted.values
+thi_fit_wend <- gam(
+  formula = count_dh ~ s(temp, humidity, k=15), 
+  data = dat_weekend
+)
+# summary(thi_fit_wend)
+# plot(thi_fit_wend, all.terms = T, pages = 1)
+# par(mfrow=c(2,2)); gam.check(thi_fit_wend)
+
+# 2. surface
+temp_seq <- seq(min(dat_weekend$temp), max(dat_weekend$temp), length.out = 30)
+hum_seq <- seq(min(dat_weekend$humidity), max(dat_weekend$humidity), length.out = 30)
+df <- expand.grid(temp = temp_seq, humidity = hum_seq)
+df$fitted <-predict(thi_fit_wend, df)
+mat <- reshape2::dcast(
+  data = df,
+  formula = temp~humidity, 
+  value.var = 'fitted'
+)
+rownames(mat) <- mat[,1]
+mat <- as.matrix(mat[,-1])
+plot_ly(x = temp_seq, y = hum_seq, z = mat) %>% 
+  add_surface() %>% 
+  layout(
+    scene = list(
+      xaxis = list(title = 'temp'), 
+      yaxis = list(title = 'humidity'),
+      zaxis = list(title = 'count_dh')
+    )
+  )
+```
+
+시간의 효과를 배제한 count 변수는 다음과 같다.
+$count_{dh} = count - f_{hour}(h)$
+
+temp는 count에 영향을 줄 때 선형적으로 증가하지 않을 것이다. 기온이 아주 낮거나 아주 높으면 자전거를 빌리는 사람이 없을 것이기 때문이다. 인간이 활동하기 좋은 15~25사이를 고점으로 하는 외로 볼록한 함수의 형태를 띌 것으로 추측된다.
+
+humidity 또한 선형적인 관계를 보이지는 않을것같다. 적정 습도일 때 가장 활발하고 습도가 아주 높거나 낮으면 오히려 반응변수가 작아지는데 영향을 끼칠 것이라 추측된다.
+
+그리고 경험적으로 습도와 온도는 상호작용을 일으킬 것으로 추측된다. 기온이 좀 높아도 습도가 낮으면 쾌적하다고 느낄 수 있으며 상대적으로 습도가 높으면 더 덥게 느껴진다. 
+
+이런 이유 때문에 불쾌지수라는 생활 기상 지수를 일상에 참고하기도 한다.
+
+불쾌지수 
+불쾌지수(Temperature Humidity Index, THI)는 열과 습도의 영향을 결합하는 지수를 말한다. 불쾌지수는 이슬점을 기반으로 한 무차원 수이다. 
+따라서 추가할 항은 다음과 같다.
+
+$y_{end} = f_{h|e}(hour)+ f_{thi|e}(temp, humidity) +\epsilon$
+
+$y_{day} = f_{h|d}(hour)+ f_{thi|d}(temp, humidity) +\epsilon$
+
+<br>  
+<br>  
+
+위와 같은 방식으로 변수들과의 관계를 살피며 추가한 항은 다음과 같다.
+```{r}
+
+```
+
+theoritical quantiles와 deviance residuals의 큰 불일치를 확인할 수 있다. 또한 등분산성도 만족하지 못하는 모습을 확인할 수 있다.
+따라서 link function을 quasi poisson으로 바꾸고 weight를 추가하여 분산을 안정화 시켰다.
+분산의 구조는 시간별로 다르다고 가정하고 시간의 1/표준편차를 사용하였다. 
+
+```{r}
+```
+
+분산은 아쉽지만 비교적 안정화 되었다고 판단하고 넘어갔다?
+mgcv 패키지에서 기본으로 제공하는 수정 결정계수를 보면
+평일도 같은 방식으로 
+
+최종 모형은 다음과 같다
+큰 차이가 없는 범주들은 합쳤다.
+
+
+### references
+
+Hilbe, Joseph M. Modeling count data. Cambridge University Press, 2014.
+
+Wood, Simon N. Generalized additive models: an introduction with R. CRC press, 2017.
+
+Friedman, Jerome, Trevor Hastie, and Robert Tibshirani. The elements of statistical learning. Vol. 1. No. 10. New York: Springer series in statistics, 2001.
+
+[overdispersion](https://stats.stackexchange.com/questions/62006/definition-of-dispersion-parameter-for-quasipoisson-family)에 관한 글
+
