@@ -1,0 +1,22 @@
+---
+title: "tmp"
+author: "sukhyun kwon"
+date: '2020 7 4 '
+output: html_document
+---
+
+
+**모형**
+
+$registered_{weekend} = f_{h|end}(hour) + f_{thi|end}(temp, humidity) + f_{tw|end}(temp, windspeed) + season + weather + \epsilon$
+
+$registered_{weekday} = f_{h|day}(hour) + f_{thi|day}(temp, humidity) + f_{tw|day}(temp, windspeed) + season + weather + \epsilon$
+
+$casual = f_{h|cas}(hour) + f_{thi|cas}(temp, humidity) + f_{tw|cas}(temp, windspeed) + season + weather + weekend + \epsilon$
+<br>  
+<br>  
+**예측값**
+
+$\hat{count} = \hat{registered} + \hat{casual}, \:\:\: \hat{registered} = \hat{registered_{weekend}} + \hat{registered_{weekday}}$
+<br>  
+<br>  

@@ -3,9 +3,11 @@ library(lubridate)
 library(data.table)
 library(ggplot2)
 library(dplyr)
+library(plotly)
 
 dat_tr <- fread('/home/sukhyun/dataset/bike_sharing_demand/train.csv')
 dat_te <- fread('/home/sukhyun/dataset/bike_sharing_demand/test.csv')
+
 
 
 # data cleansing ----------------------------------------------------------
@@ -51,8 +53,8 @@ dat_te$weather <- factor(
   dat_te$weather, labels = c('best', 'better', 'worse', 'worst')
 )
 # remove worst
-dat_tr <- dat_tr[!weather == 'worst', ]
-dat_te <- dat_te[!weather == 'worst', ]
+# dat_tr <- dat_tr[!weather == 'worst', ]
+# dat_te <- dat_te[!weather == 'worst', ]
 
 
 # date
@@ -74,6 +76,9 @@ dat_tr$weekend <- ifelse(
 dat_te$weekend <- ifelse(
   dat_te$weekdays %in% c('saturday', 'sunday'), 'yes', 'no'
 )
+dat_tr$weekend <- factor(dat_tr$weekend)
+dat_te$weekend <- factor(dat_te$weekend)
+
 
 # month
 dat_tr$month <- month(dat_tr$date)
@@ -82,6 +87,7 @@ dat_te$month <- month(dat_te$date)
 # year
 dat_tr$year <- year(dat_tr$date)
 dat_te$year <- year(dat_te$date)
+
 
 # order
 var_order <- c(
@@ -94,6 +100,19 @@ dat_tr <- dat_tr[, var_order, with = F]
 dat_te <- dat_te[, var_order, with = F]
 rm(var_order)
 
-dat <- rbind(dat_tr, dat_te)
-dat_weekend <- dat_tr[weekend == 'yes', ]
-dat_weekday <- dat_tr[weekend == 'no', ]
+# pooling category
+dat_te$weather2 <- factor(
+  ifelse(dat_te$weather %in% c('worse', 'worst'), 'worse', 'not_worse')
+)
+dat_te$season2 <- as.character(dat_te$season)
+dat_te$season2[dat_te$season2 %in% c('summer', 'fall')] <- 'summer_fall'
+dat_te$season2 <- factor(dat_te$season2)
+
+dat_tr$weather2 <- factor(
+  ifelse(dat_tr$weather %in% c('worse', 'worst'), 'worse', 'not_worse')
+)
+dat_tr$season2 <- as.character(dat_tr$season)
+dat_tr$season2[dat_tr$season2 %in% c('summer', 'fall')] <- 'summer_fall'
+dat_tr$season2 <- factor(dat_tr$season2)
+
+# dat <- rbind(dat_tr, dat_te)

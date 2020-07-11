@@ -1,6 +1,6 @@
 # source ------------------------------------------------------------------
 source('./R/data_cleansing.R')
-
+source('./R/functions.R')
 
 # y -----------------------------------------------------------------------
 nrow(dat_tr)
@@ -90,68 +90,30 @@ par(mfrow = c(1,1))
 plot(dat_tr$hour, dat_tr$count, 'n', xlab = 'hour', ylab = 'count')
 by(dat_tr, dat_tr$date, function(d) lines(d$hour, d$count, col=alpha(1, 0.3)))
 
-# data <- dat_tr 
-# figsize <- c(1,2)
-# group <- 'weekend'
-# y <- 'count'
-profile_hour <- function(data, figsize = c(1,2), group, y) {
-  par(mfrow = figsize)
-  for (i in unique(data[[group]])) {
-    plot(
-      data$hour, data[[y]], 'n',
-      main = paste(group, i, sep = ' : '),
-      xlab = 'hour', ylab = 'count', xaxt='n'
-    )
-    axis(1, 0:23)
-    by(
-      data[data[[group]] == i],
-      data[data[[group]] == i]$date,
-      function(d) lines(d$hour, d[[y]], col=alpha(1, 0.3))
-    ) 
-    means <- tapply(
-      data[data[[group]] == i]$count,
-      data[data[[group]] == i]$hour,
-      mean
-    )
-    lines(0:23, means, lwd=5, col='dodgerblue1')
-  }
-  invisible(NULL)
-}
-profile_hour(dat_tr, c(2,2), 'season', 'count')
-profile_hour(dat_tr, c(1,2), 'holiday', 'count')
-profile_hour(dat_tr, c(1,2), 'workingday', 'count')
-profile_hour(dat_tr, c(2,4), 'weekdays', 'count')
-profile_hour(dat_tr, c(2,2), 'weather', 'count')
-profile_hour(dat_tr, c(1,2), 'weekend', 'count')
+day_profile_plot(dat_tr, 'season', 'count', c(2,2))
+day_profile_plot(dat_tr, 'holiday', 'count', c(1,2))
+day_profile_plot(dat_tr, 'workingday', 'count', c(1,2))
+day_profile_plot(dat_tr, 'weekdays', 'count', c(2,4))
+day_profile_plot(dat_tr, 'weather', 'count', c(2,2))
+day_profile_plot(dat_tr, 'weekend', 'count', c(1,2)) #########
 
-profile_hour(dat_tr, c(2,2), 'season', 'registered')
-profile_hour(dat_tr, c(1,2), 'holiday', 'registered')
-profile_hour(dat_tr, c(1,2), 'workingday', 'registered')
-profile_hour(dat_tr, c(2,4), 'weekdays', 'registered')
-profile_hour(dat_tr, c(2,2), 'weather', 'registered')
-profile_hour(dat_tr, c(1,2), 'weekend', 'registered')
+day_profile_plot(dat_tr, 'season', 'registered', c(2,2))
+day_profile_plot(dat_tr, 'holiday', 'registered', c(1,2))
+day_profile_plot(dat_tr, 'workingday', 'registered', c(1,2))
+day_profile_plot(dat_tr, 'weekdays', 'registered', c(2,4))
+day_profile_plot(dat_tr, 'weather', 'registered', c(2,2))
+day_profile_plot(dat_tr, 'weekend', 'registered', c(1,2)) #########
 
-profile_hour(dat_tr, c(2,2), 'season', 'casual')
-profile_hour(dat_tr, c(1,2), 'holiday', 'casual')
-profile_hour(dat_tr, c(1,2), 'workingday', 'casual')
-profile_hour(dat_tr, c(2,4), 'weekdays', 'casual')
-profile_hour(dat_tr, c(2,2), 'weather', 'casual')
-profile_hour(dat_tr, c(1,2), 'weekend', 'casual')
-
-dev.off()
-profile_hour(dat_tr, c(1,2), 'weekend', 'casual')
-profile_hour(dat_tr, c(1,2), 'weekend', 'registered')
-profile_hour(dat_tr, c(1,2), 'weekend', 'count')
-
-
-profile_hour(data_pre, c(1,2), 'weekend', 'casual')
-profile_hour(data_pre, c(1,2), 'weekend', 'registered')
-profile_hour(data_pre, c(1,2), 'weekend', 'count')
+day_profile_plot(dat_tr, 'season', 'casual', c(2,2))
+day_profile_plot(dat_tr, 'holiday', 'casual', c(1,2))
+day_profile_plot(dat_tr, 'workingday', 'casual', c(1,2))
+day_profile_plot(dat_tr, 'weekdays', 'casual', c(2,4))
+day_profile_plot(dat_tr, 'weather', 'casual', c(2,2))
+day_profile_plot(dat_tr, 'weekend', 'casual', c(1,2)) #########
 
 
 
-
-#
+# scatter plot
 ggplot(dat_tr, aes(x=temp, y=count)) +
   geom_point() + facet_grid(weather~season)
 
@@ -161,8 +123,6 @@ ggplot(dat_tr, aes(x=temp, y=count)) +
 ggplot(dat_tr, aes(x=temp, y=count)) +
   geom_point() + facet_grid(weekend~season)
 
-
-
 ggplot(dat_tr, aes(x=humidity, y=count)) +
   geom_point() + facet_grid(weather~season)
 
@@ -171,9 +131,6 @@ ggplot(dat_tr, aes(x=humidity, y=count)) +
 
 ggplot(dat_tr, aes(x=humidity, y=count)) +
   geom_point() + facet_grid(weekend~season)
-
-
-
 
 ggplot(dat_tr, aes(x=windspeed, y=count)) +
   geom_point() + facet_grid(weather~season)
@@ -185,12 +142,9 @@ ggplot(dat_tr, aes(x=windspeed, y=count)) +
   geom_point() + facet_grid(weekend~season)
 
 
-
-
+# cross table
 table(dat_tr$season, dat_tr$holiday)
 table(dat_tr$season, dat_tr$weekdays)
 table(dat_tr$season, dat_tr$weekend)
 table(dat_tr$season, dat_tr$workingday)
 table(dat_tr$season, dat_tr$weather)
-
-
