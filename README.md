@@ -8,6 +8,7 @@ output: html_document
 
 
 학습용 문서 입니다.
+"![](http://latex.codecogs.com/gif.latex?a%20%3D%20%5Cfrac%7Bb%7D%7Bc%7D)"
 <br>  
 
 ## 데이터 이해 
@@ -37,23 +38,23 @@ $y$를 포아송 분포라고 할 수 있을까? 포아송 분포의 가정을 �
 # 데이터 탐색
 모델링 하기에 앞서서 데이터에 대한 이해가 필요하기 때문에 다양한 그림과 기초 통계 수치를 살펴볼 필요가 있다.
 <br>  
-![plot of chunk unnamed-chunk-32](figure/unnamed-chunk-32-1.png)
+![plot of chunk unnamed-chunk-2](figure/unnamed-chunk-2-1.png)
 평균과 분산은 큰 차이가 있고 분포가 매우 비대칭적임을 볼 수 있다.
 <br>  
 <br>  
 
-![plot of chunk unnamed-chunk-33](figure/unnamed-chunk-33-1.png)
+![plot of chunk unnamed-chunk-3](figure/unnamed-chunk-3-1.png)
 시간의 흐름에 따라 어떤 패턴이 있어 보이지만 비교적 분명하지는 않아 보인다.
 자전거 대여점의 특성상 매일 정해진 영업 시간에만 운영 되기 때문에 하루 단위로 보는것이 더 적절할 것이라 판단된다.
 <br>  
 <br>  
 
-![plot of chunk unnamed-chunk-34](figure/unnamed-chunk-34-1.png)
+![plot of chunk unnamed-chunk-4](figure/unnamed-chunk-4-1.png)
 <br>  
 위 그림의 개별 선은 1일이고 시간의 흐름에 따른 대여 횟수의 변화를 나타낸다. 하루 단위로 대여 횟수의 변화가 어느정도 눈에 보인다.
 
 <br>  
-![plot of chunk unnamed-chunk-35](figure/unnamed-chunk-35-1.png)
+![plot of chunk unnamed-chunk-5](figure/unnamed-chunk-5-1.png)
 <br>  
 다양한 범주형 변수로 구분해서 그려본 결과 이용자 방문 패턴은 주중/주말에 가장 뚜렷하게 차이가 났다.
 주중에 6~9, 17~18시 부근에 이용자가 급격히 증가하는 것은 아마도 출퇴근하는 사람으로 추측할 수 있다. 모델링에 이런 차이를 반영하는것이 좋을 것 같다.
@@ -62,7 +63,7 @@ $y$를 포아송 분포라고 할 수 있을까? 포아송 분포의 가정을 �
 
 ## count? casual? registered?
 기존에 회원으로 등록된 사용자들과 그렇지 않은 사용자들에 패턴의 차이가 있다면 이를 모델링에 반영하는것이 모델링 정확도를 높일 수 있을것이다. 기본적으로 $y$로 사용될 변수는 count이고 이는 casual과 registered의 합이다.
-![plot of chunk unnamed-chunk-36](figure/unnamed-chunk-36-1.png)![plot of chunk unnamed-chunk-36](figure/unnamed-chunk-36-2.png)
+![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-1.png)![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-2.png)
 <br>  
 casual, registered의 패턴 차이가 있어 보인다. 출퇴근 시간에 이용자가 급증하는 것은 registered 이용자들에게만 나타나는 패턴을 볼 수 있다. casual 이용자들은 그와 같은 패턴이 없고 전반적으로 대여 횟수가 적은것을 확인 할 수 있다.  
 몇몇 kaggle 사용자들은 casual, registered 변수를 count를 예측하는 설명변수로 썼는데 이것은 완전 넌센스라고 본다. **casual, registered는 또 다른 $y$이지 $x$가 아니다 (count = registered + casual)**. 참고로 registered와 count의 단순 상관 계수는 0.97이다. 산점도를 그려보면 그 관계가 확실하게 보이고 주중/주말로 나눠 그려보면 그냥 직선이다. 
@@ -108,12 +109,12 @@ summary(poi_fit)
 ## 
 ## Number of Fisher Scoring iterations: 5
 ```
-![plot of chunk unnamed-chunk-38](figure/unnamed-chunk-38-1.png)
+![plot of chunk unnamed-chunk-8](figure/unnamed-chunk-8-1.png)
 <br>  
 계수의 유의성은 있지만 시간의 흐름에 따른 영향을 배제하거나 포함하지 않았기 때문에 이 결과를 신뢰하기 어렵다. 또한 모형의 설명력도 매우 좋지 않다.
 
 <br>  
-![plot of chunk unnamed-chunk-39](figure/unnamed-chunk-39-1.png)
+![plot of chunk unnamed-chunk-9](figure/unnamed-chunk-9-1.png)
 <br>  
 obs는 $y_i$의 빈도를 나타낸다. exp는 poisson 모형에서 계산된  $\lambda_i^{\verb!^!}$에 의해 생성된 기대 빈도이다. 모형의 가정과 실제값이 큰 차이가 있음을 확인할 수 있다.
 <br>  
@@ -287,7 +288,7 @@ plot(
 )
 ```
 
-![plot of chunk unnamed-chunk-41](figure/unnamed-chunk-41-1.png)
+![plot of chunk unnamed-chunk-11](figure/unnamed-chunk-11-1.png)
 
 registered, 주말 먼저 진행했고... 맨 먼저 다음과 같은 모형을 가정했다. 
 
@@ -375,7 +376,7 @@ plot(
 )
 ```
 
-![plot of chunk unnamed-chunk-43](figure/unnamed-chunk-43-1.png)
+![plot of chunk unnamed-chunk-13](figure/unnamed-chunk-13-1.png)
 
 잔차 진단 결과 관측값별로 분산이 일정치 않음을 볼 수 있다. weight를 추가하여 분산을 안정화 시켰다. 분산의 구조는 시간별로 다르다고 가정하고 시간의 1/표준편차를 사용하였다. 따라서 최종 모형의 잔차 진단 그림은 다음과 같다.
 <br>  
@@ -388,7 +389,7 @@ par(mfrow=c(2,2))
 gam.check(regit_end)
 ```
 
-![plot of chunk unnamed-chunk-44](figure/unnamed-chunk-44-1.png)
+![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-1.png)
 
 ```
 ## 
@@ -419,7 +420,7 @@ gam.check(regit_end)
 plot(regit_end, pages = 1, all.terms = T)
 ```
 
-![plot of chunk unnamed-chunk-45](figure/unnamed-chunk-45-1.png)
+![plot of chunk unnamed-chunk-15](figure/unnamed-chunk-15-1.png)
 
 gam object를 plot함수에 적용하면 partial residual plot이 나온다. partial residual plot은 모형에 포함된 다른 설명 변수가 주어졌다는 가정하에 한 설명변수와 반응 변수의 관계를 나타내는 그림이다. 다른 설명변수는 연속형의 경우 중위수, 범주형의 경우 최빈값으로 주어진다.
 
@@ -477,9 +478,9 @@ $\hat{count} = \hat{registered} + \hat{casual}, \:\:\: \hat{registered} = \hat{r
 <br>  
 
 #### 3) 예측값 시각화
-![plot of chunk unnamed-chunk-48](figure/unnamed-chunk-48-1.png)
-![plot of chunk unnamed-chunk-49](figure/unnamed-chunk-49-1.png)
-![plot of chunk unnamed-chunk-50](figure/unnamed-chunk-50-1.png)
+![plot of chunk unnamed-chunk-18](figure/unnamed-chunk-18-1.png)
+![plot of chunk unnamed-chunk-19](figure/unnamed-chunk-19-1.png)
+![plot of chunk unnamed-chunk-20](figure/unnamed-chunk-20-1.png)
 <br>  
 <br>  
 <br>  
