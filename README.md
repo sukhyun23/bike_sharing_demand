@@ -7,12 +7,16 @@ output: html_document
 
 
 
+full text : https://rpubs.com/sukhyun23/638020
+data : https://www.kaggle.com/c/bike-sharing-demand/data
+<br>  
+<br>  
 
-# 데이터 탐색
+## 데이터 탐색
 데이터 이해를 위한 그림, 기초 통계
 <br>  
 ![plot of chunk unnamed-chunk-2](figure/unnamed-chunk-2-1.png)
-평균과 분산은 큰 차이가 있고 분포가 매우 비대칭적임을 볼 수 있다.
+평균과 분산은 큰 차이가 있고 분포가 매우 비대칭적임.
 <br>  
 <br>  
 
@@ -32,8 +36,8 @@ output: html_document
 <br>  
 <br>  
 
-## count? casual? registered?
-count = casual + registered
+## count? casual? registered?  
+count = casual + registered  
 ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-1.png)![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-2.png)
 <br>  
 casual과 registered의 패턴에 차이 존재함. 출퇴근 시간의 급증은 registered에만 존재.
@@ -54,52 +58,22 @@ summary(poi_fit)
 ## glm(formula = model, family = poisson, data = dat_tr)
 ## 
 ## Deviance Residuals: 
-##     Min       1Q   Median  
-## -25.193  -10.333   -3.019  
-##      3Q      Max  
-##   4.723   43.102  
+##     Min       1Q   Median       3Q      Max  
+## -25.193  -10.333   -3.019    4.723   43.102  
 ## 
 ## Coefficients:
-##                 Estimate
-## (Intercept)    5.024e+00
-## weekendyes     5.633e-03
-## weatherbetter  8.411e-02
-## weatherworse  -1.616e-01
-## weatherworst   8.341e-01
-## temp           4.399e-02
-## humidity      -1.327e-02
-## windspeed      3.646e-03
-##               Std. Error
-## (Intercept)    3.869e-03
-## weekendyes     1.534e-03
-## weatherbetter  1.702e-03
-## weatherworse   3.389e-03
-## weatherworst   7.811e-02
-## temp           8.961e-05
-## humidity       4.161e-05
-## windspeed      8.880e-05
-##                z value
-## (Intercept)   1298.697
-## weekendyes       3.672
-## weatherbetter   49.417
-## weatherworse   -47.681
-## weatherworst    10.677
-## temp           490.929
-## humidity      -318.839
-## windspeed       41.059
-##               Pr(>|z|)    
-## (Intercept)    < 2e-16 ***
-## weekendyes     0.00024 ***
-## weatherbetter  < 2e-16 ***
-## weatherworse   < 2e-16 ***
-## weatherworst   < 2e-16 ***
-## temp           < 2e-16 ***
-## humidity       < 2e-16 ***
-## windspeed      < 2e-16 ***
+##                 Estimate Std. Error  z value Pr(>|z|)    
+## (Intercept)    5.024e+00  3.869e-03 1298.697  < 2e-16 ***
+## weekendyes     5.633e-03  1.534e-03    3.672  0.00024 ***
+## weatherbetter  8.411e-02  1.702e-03   49.417  < 2e-16 ***
+## weatherworse  -1.616e-01  3.389e-03  -47.681  < 2e-16 ***
+## weatherworst   8.341e-01  7.811e-02   10.677  < 2e-16 ***
+## temp           4.399e-02  8.961e-05  490.929  < 2e-16 ***
+## humidity      -1.327e-02  4.161e-05 -318.839  < 2e-16 ***
+## windspeed      3.646e-03  8.880e-05   41.059  < 2e-16 ***
 ## ---
 ## Signif. codes:  
-##   0 '***' 0.001 '**' 0.01
-##   '*' 0.05 '.' 0.1 ' ' 1
+## 0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
 ## (Dispersion parameter for poisson family taken to be 1)
 ## 
@@ -111,11 +85,11 @@ summary(poi_fit)
 ```
 ![plot of chunk unnamed-chunk-8](figure/unnamed-chunk-8-1.png)
 <br>  
-시간 패턴 반영 X, 성능 나쁨.
+시간 패턴 반영 X, 성능 좋지 않음.
 <br>  
 ![plot of chunk unnamed-chunk-9](figure/unnamed-chunk-9-1.png)
 <br>  
-가정된 모형과 실제 데이터에 큰 차이를 보임.
+가정된 모형과 실제 데이터에 큰 차이.
 <br>  
 <br>  
 
@@ -159,26 +133,18 @@ summary(hour_fit)
 ## registered ~ s(hour, bs = "cr", k = 14)
 ## 
 ## Parametric coefficients:
-##             Estimate
-## (Intercept) 4.447066
-##             Std. Error t value
-## (Intercept)   0.008852   502.4
-##             Pr(>|t|)    
-## (Intercept)   <2e-16 ***
+##             Estimate Std. Error t value Pr(>|t|)    
+## (Intercept) 4.447066   0.008852   502.4   <2e-16 ***
 ## ---
 ## Signif. codes:  
-##   0 '***' 0.001 '**' 0.01
-##   '*' 0.05 '.' 0.1 ' ' 1
+## 0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
 ## Approximate significance of smooth terms:
-##           edf Ref.df    F
-## s(hour) 12.51  12.95 1080
-##         p-value    
-## s(hour)  <2e-16 ***
+##           edf Ref.df    F p-value    
+## s(hour) 12.51  12.95 1080  <2e-16 ***
 ## ---
 ## Signif. codes:  
-##   0 '***' 0.001 '**' 0.01
-##   '*' 0.05 '.' 0.1 ' ' 1
+## 0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
 ## R-sq.(adj) =  0.709   Deviance explained = 84.9%
 ## GCV = 0.35808  Scale est. = 0.34808   n = 3163
@@ -205,24 +171,15 @@ plot(
 ## y_dh ~ s(temp, humidity, k = 15)
 ## 
 ## Parametric coefficients:
-##             Estimate
-## (Intercept)  0.09288
-##             Std. Error t value
-## (Intercept)    0.96321   0.096
-##             Pr(>|t|)
-## (Intercept)    0.923
+##             Estimate Std. Error t value Pr(>|t|)
+## (Intercept)  0.09288    0.96321   0.096    0.923
 ## 
 ## Approximate significance of smooth terms:
-##                    edf Ref.df
-## s(temp,humidity) 13.88     14
-##                      F p-value
-## s(temp,humidity) 100.1  <2e-16
-##                     
-## s(temp,humidity) ***
+##                    edf Ref.df     F p-value    
+## s(temp,humidity) 13.88     14 100.1  <2e-16 ***
 ## ---
 ## Signif. codes:  
-##   0 '***' 0.001 '**' 0.01
-##   '*' 0.05 '.' 0.1 ' ' 1
+## 0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
 ## R-sq.(adj) =  0.305   Deviance explained = 30.8%
 ## GCV = 2948.4  Scale est. = 2934.6    n = 3163
@@ -269,6 +226,8 @@ plot(
 ![plot of chunk unnamed-chunk-13](figure/unnamed-chunk-13-1.png)
 <br>  
 <br>  
+관측치 등분산성 확인.
+
 
 
 ```r
@@ -291,22 +250,13 @@ gam.check(regit_end)
 ## Basis dimension (k) checking results. Low p-value (k-index<1) may
 ## indicate that k is too low, especially if edf is close to k'.
 ## 
-##                      k'   edf
-## s(hour)           13.00 12.83
-## s(temp,humidity)   9.00  7.45
-## s(temp,windspeed) 10.00  9.43
-##                   k-index
-## s(hour)              0.63
-## s(temp,humidity)     0.92
-## s(temp,windspeed)    0.96
-##                   p-value    
-## s(hour)            <2e-16 ***
-## s(temp,humidity)   <2e-16 ***
-## s(temp,windspeed)   0.015 *  
+##                      k'   edf k-index p-value    
+## s(hour)           13.00 12.83    0.63  <2e-16 ***
+## s(temp,humidity)   9.00  7.45    0.92  <2e-16 ***
+## s(temp,windspeed) 10.00  9.43    0.96    0.01 ** 
 ## ---
 ## Signif. codes:  
-##   0 '***' 0.001 '**' 0.01
-##   '*' 0.05 '.' 0.1 ' ' 1
+## 0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
 <br>  
   
@@ -322,23 +272,19 @@ plot(regit_end, pages = 1, all.terms = T)
 
 
 ```r
-gam.vis(regit_end, c('temp', 'humidity'), type = 'response')
+vis.gam(regit_end, c('temp', 'humidity'), type = 'response')
 ```
 
-```
-## Error in gam.vis(regit_end, c("temp", "humidity"), type = "response"): could not find function "gam.vis"
-```
+![plot of chunk unnamed-chunk-16](figure/unnamed-chunk-16-1.png)
 <br>  
 <br>    
 
 
 ```r
-gam.vis(regit_end, c('temp', 'windspeed'), type = 'response')
+vis.gam(regit_end, c('temp', 'windspeed'), type = 'response')
 ```
 
-```
-## Error in gam.vis(regit_end, c("temp", "windspeed"), type = "response"): could not find function "gam.vis"
-```
+![plot of chunk unnamed-chunk-17](figure/unnamed-chunk-17-1.png)
 <br>  
 <br>  
 

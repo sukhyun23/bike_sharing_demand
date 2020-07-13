@@ -13,8 +13,12 @@ library(mgcv); library(reshape2); library(plotly)
 source('/home/sukhyun/project/bike_sharing_demand/R/data_cleansing.R')
 source('/home/sukhyun/project/bike_sharing_demand/R/functions.R')
 ```
+full text : https://rpubs.com/sukhyun23/638020
+data : https://www.kaggle.com/c/bike-sharing-demand/data
+<br>  
+<br>  
 
-# 데이터 탐색
+## 데이터 탐색
 데이터 이해를 위한 그림, 기초 통계
 <br>  
 ```{r, echo=FALSE, fig.width=12, fig.height=4}
@@ -30,7 +34,7 @@ for (i in c('casual', 'registered', 'count')) {
   )
 }
 ```
-평균과 분산은 큰 차이가 있고 분포가 매우 비대칭적임을 볼 수 있다.
+평균과 분산은 큰 차이가 있고 분포가 매우 비대칭적임.
 <br>  
 <br>  
 
@@ -69,8 +73,8 @@ day_profile_plot(dat_tr, 'weekend', 'count', c(1,2))
 <br>  
 <br>  
 
-## count? casual? registered?
-count = casual + registered
+## count? casual? registered?  
+count = casual + registered  
 ```{r, echo=FALSE, fig.width=7, fig.height=3.5, message=FALSE, warning=FALSE}
 day_profile_plot(dat_tr, 'weekend', 'registered')
 day_profile_plot(dat_tr, 'weekend', 'casual')
@@ -91,7 +95,7 @@ par(mfrow = c(1,1), mar = c(4,4,1.5,1))
 plot(dat_tr$count, poi_fit$fitted, xlab = 'count', ylab = 'fitted')
 ```
 <br>  
-시간 패턴 반영 X, 성능 나쁨.
+시간 패턴 반영 X, 성능 좋지 않음.
 <br>  
 ```{r, fig.width=5.5, fig.height=3.5, echo=FALSE}
 # observed vs expected
@@ -109,7 +113,7 @@ lines(1:100, exp_counts, col = 'blue')
 legend('topright', c('obs', 'exp'), pch=19, col=c('red', 'blue'))
 ```
 <br>  
-가정된 모형과 실제 데이터에 큰 차이를 보임.
+가정된 모형과 실제 데이터에 큰 차이.
 <br>  
 <br>  
 ```{r}
@@ -193,6 +197,8 @@ plot(
 ```
 <br>  
 <br>  
+관측치 등분산성 확인.
+
 
 ```{r, fig.height=6, fig.width=6}
 regit_end <- readRDS('/home/sukhyun/project/bike_sharing_demand/model/regit_end.rds')
@@ -209,13 +215,13 @@ plot(regit_end, pages = 1, all.terms = T)
 <br>  
 
 ```{r}
-gam.vis(regit_end, c('temp', 'humidity'), type = 'response')
+vis.gam(regit_end, c('temp', 'humidity'), type = 'response')
 ```
 <br>  
 <br>    
 
 ```{r}
-gam.vis(regit_end, c('temp', 'windspeed'), type = 'response')
+vis.gam(regit_end, c('temp', 'windspeed'), type = 'response')
 ```
 <br>  
 <br>  
