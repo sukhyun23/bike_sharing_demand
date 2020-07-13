@@ -8,6 +8,7 @@ output: html_document
 
 
 full text : https://rpubs.com/sukhyun23/638020
+
 data : https://www.kaggle.com/c/bike-sharing-demand/data
 <br>  
 <br>  
@@ -253,7 +254,7 @@ gam.check(regit_end)
 ##                      k'   edf k-index p-value    
 ## s(hour)           13.00 12.83    0.63  <2e-16 ***
 ## s(temp,humidity)   9.00  7.45    0.92  <2e-16 ***
-## s(temp,windspeed) 10.00  9.43    0.96    0.01 ** 
+## s(temp,windspeed) 10.00  9.43    0.96   0.045 *  
 ## ---
 ## Signif. codes:  
 ## 0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1

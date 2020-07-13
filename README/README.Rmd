@@ -14,6 +14,7 @@ source('/home/sukhyun/project/bike_sharing_demand/R/data_cleansing.R')
 source('/home/sukhyun/project/bike_sharing_demand/R/functions.R')
 ```
 full text : https://rpubs.com/sukhyun23/638020
+
 data : https://www.kaggle.com/c/bike-sharing-demand/data
 <br>  
 <br>  
