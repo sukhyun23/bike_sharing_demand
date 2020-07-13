@@ -79,6 +79,10 @@ dat_te$weekend <- ifelse(
 dat_tr$weekend <- factor(dat_tr$weekend)
 dat_te$weekend <- factor(dat_te$weekend)
 
+dat_tr$weekdays <- factor(dat_tr$weekdays)
+dat_te$weekdays <- factor(dat_te$weekdays)
+
+
 
 # month
 dat_tr$month <- month(dat_tr$date)
