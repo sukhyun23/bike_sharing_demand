@@ -5,18 +5,75 @@ date: '2020 7 4 '
 output: html_document
 ---
 
+<img src="https://latex.codecogs.com/svg.latex?&space;f_Y(y;\\theta,\phi)=exp{ \frac {y\theta-B(\theta)} {\phi} + C(y,\phi) \}"/>
 
-**모형**
 
-$registered_{weekend} = f_{h|end}(hour) + f_{thi|end}(temp, humidity) + f_{tw|end}(temp, windspeed) + season + weather + \epsilon$
 
-$registered_{weekday} = f_{h|day}(hour) + f_{thi|day}(temp, humidity) + f_{tw|day}(temp, windspeed) + season + weather + \epsilon$
+latexImg('x')
+latexImg('y')
+latexImg('n')
+latexImg("\\lambda")
+latexImg('f(n;\\lambda) = \\frac {\\lambda^ne^{-\\lambda}} {n!}$ $, \\lambda > 0')
+latexImg('\\hat{\\lambda_i}')
+latexImg('f_Y(y;\\theta,\\phi)=exp\\{ \\frac {y\\theta-B(\\theta)} {\\phi} + C(y,\\phi) \\}, ')
+latexImg('B(.), C(.)')
+latexImg('\\theta')
+latexImg('\\phi')
+latexImg('Y')
+latexImg("\\mu=E[Y]=B'(\\theta)$ $Var[Y]=B''(\\theta)\\phi=V(\\mu)\\phi")
+latexImg("B''(\\theta)")
+latexImg('Poisson(\\lambda)')
+latexImg('f_Y(y) = \\frac {\\lambda^ye^{-\\lambda}} {y!}' )
+latexImg('\\quad\\quad\\:\\:\\:=exp\\{ylog\\lambda-\\lambda-logy!\\}')
+latexImg('\\quad\\quad\\:\\:\\:=exp\\{\\frac {ylog\\lambda-\\lambda} {1} -logy!\\}')
+latexImg('\\phi > 1')
+latexImg('\\phi^{\\verb!^!} = \\frac {1} {n-k} \\Sigma \\frac {(Y_i-\\mu_i^{\\verb!^!})^{2}} {\\mu_i^{\\verb!^!}}'  )
+latexImg('k')
+latexImg('{\\mu_i^{\\verb!^!}}=g^{-1}(\\eta_i^{\\verb!^!})')
+latexImg('Pearson\\ \\chi^{2}')
+latexImg('V(Y_i|\\eta_i) = \\mu_i + \\mu_i^{2}/\\phi = \\mu_i(1+\\mu_i/\\phi), ')
+latexImg('\\eta_i')
+latexImg('\\phi \\rightarrow \\infty')
+latexImg('f_{hour}(h)')
 
-$casual = f_{h|cas}(hour) + f_{thi|cas}(temp, humidity) + f_{tw|cas}(temp, windspeed) + season + weather + weekend + \epsilon$
-<br>  
-<br>  
-**예측값**
 
-$\hat{count} = \hat{registered} + \hat{casual}, \:\:\: \hat{registered} = \hat{registered_{weekend}} + \hat{registered_{weekday}}$
+
+
+
+
+$x$
+![](http://latex.codecogs.com/gif.latex?x)
+
+$y$
+![](http://latex.codecogs.com/gif.latex?y)
+
+$n$
+![](http://latex.codecogs.com/gif.latex?n)
+
+
+![](http://latex.codecogs.com/gif.latex?%5Clambda)
+![](http://latex.codecogs.com/gif.latex?f(n;%5Clambda)%20%3D%20%5Cfrac%20%7B%5Clambda%5Ene%5E%7B-%5Clambda%7D%7D%20%7Bn!%7D$%20$,%20%5Clambda%20%3E%200)
+![](http://latex.codecogs.com/gif.latex?%5Chat%7B%5Clambda_i%7D)
+![](http://latex.codecogs.com/gif.latex?f_Y(y;%5Ctheta,%5Cphi)%3Dexp%5C%7B%20%5Cfrac%20%7By%5Ctheta-B(%5Ctheta)%7D%20%7B%5Cphi%7D%20+%20C(y,%5Cphi)%20%5C%7D,%20)
+![](http://latex.codecogs.com/gif.latex?B(.),%20C(.))
+![](http://latex.codecogs.com/gif.latex?%5Ctheta)
+![](http://latex.codecogs.com/gif.latex?%5Cphi)
+![](http://latex.codecogs.com/gif.latex?Y)
+![](http://latex.codecogs.com/gif.latex?%5Cmu%3DE[Y]%3DB'(%5Ctheta)$%20$Var[Y]%3DB''(%5Ctheta)%5Cphi%3DV(%5Cmu)%5Cphi)
+![](http://latex.codecogs.com/gif.latex?B''(%5Ctheta))
+![](http://latex.codecogs.com/gif.latex?Poisson(%5Clambda))
+![](http://latex.codecogs.com/gif.latex?f_Y(y)%20%3D%20%5Cfrac%20%7B%5Clambda%5Eye%5E%7B-%5Clambda%7D%7D%20%7By!%7D)
+![](http://latex.codecogs.com/gif.latex?%5Cquad%5Cquad%5C:%5C:%5C:%3Dexp%5C%7Bylog%5Clambda-%5Clambda-logy!%5C%7D)
+![](http://latex.codecogs.com/gif.latex?%5Cquad%5Cquad%5C:%5C:%5C:%3Dexp%5C%7B%5Cfrac%20%7Bylog%5Clambda-%5Clambda%7D%20%7B1%7D%20-logy!%5C%7D)
+![](http://latex.codecogs.com/gif.latex?%5Cphi%20%3E%201)
+![](http://latex.codecogs.com/gif.latex?%5Cphi%5E%7B%5Cverb!%5E!%7D%20%3D%20%5Cfrac%20%7B1%7D%20%7Bn-k%7D%20%5CSigma%20%5Cfrac%20%7B(Y_i-%5Cmu_i%5E%7B%5Cverb!%5E!%7D)%5E%7B2%7D%7D%20%7B%5Cmu_i%5E%7B%5Cverb!%5E!%7D%7D)
+![](http://latex.codecogs.com/gif.latex?k)
+![](http://latex.codecogs.com/gif.latex?%7B%5Cmu_i%5E%7B%5Cverb!%5E!%7D%7D%3Dg%5E%7B-1%7D(%5Ceta_i%5E%7B%5Cverb!%5E!%7D))
+![](http://latex.codecogs.com/gif.latex?Pearson%5C%20%5Cchi%5E%7B2%7D)
+![](http://latex.codecogs.com/gif.latex?V(Y_i%7C%5Ceta_i)%20%3D%20%5Cmu_i%20+%20%5Cmu_i%5E%7B2%7D/%5Cphi%20%3D%20%5Cmu_i(1+%5Cmu_i/%5Cphi),%20)
+![](http://latex.codecogs.com/gif.latex?%5Ceta_i)
+![](http://latex.codecogs.com/gif.latex?%5Cphi%20%5Crightarrow%20%5Cinfty)
+![](http://latex.codecogs.com/gif.latex?f_%7Bhour%7D(h))
+
 <br>  
 <br>  
