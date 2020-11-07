@@ -88,7 +88,12 @@ for (i in c('casual', 'registered', 'count')) {
 # profile by day
 par(mfrow = c(1,1))
 plot(dat_tr$hour, dat_tr$count, 'n', xlab = 'hour', ylab = 'count')
-by(dat_tr, dat_tr$date, function(d) lines(d$hour, d$count, col=alpha(1, 0.3)))
+linef <- function(d) {
+  lines(d$hour, d$count, col=alpha(1, 0.3))
+  invisible(NULL)
+}
+p <- lapply(split(dat_tr, dat_tr$date), linef)
+
 
 day_profile_plot(dat_tr, 'season', 'count', c(2,2))
 day_profile_plot(dat_tr, 'holiday', 'count', c(1,2))

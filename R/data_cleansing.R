@@ -56,7 +56,6 @@ dat_te$weather <- factor(
 # dat_tr <- dat_tr[!weather == 'worst', ]
 # dat_te <- dat_te[!weather == 'worst', ]
 
-
 # date
 dat_tr$date <- as.Date(dat_tr$datetime)
 dat_te$date <- as.Date(dat_te$datetime)
@@ -82,8 +81,6 @@ dat_te$weekend <- factor(dat_te$weekend)
 dat_tr$weekdays <- factor(dat_tr$weekdays)
 dat_te$weekdays <- factor(dat_te$weekdays)
 
-
-
 # month
 dat_tr$month <- month(dat_tr$date)
 dat_te$month <- month(dat_te$date)
@@ -91,7 +88,6 @@ dat_te$month <- month(dat_te$date)
 # year
 dat_tr$year <- year(dat_tr$date)
 dat_te$year <- year(dat_te$date)
-
 
 # order
 var_order <- c(

@@ -1,4 +1,5 @@
 # source ------------------------------------------------------------------
+setwd('/home/sukhyun/project/bike_sharing_demand')
 source('./R/data_cleansing.R')
 source('./R/functions.R')
 library(mgcv)
